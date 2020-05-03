@@ -18,9 +18,11 @@ const transactionsRouter = Router();
 transactionsRouter.use(ensureAuthenticated);
 
 transactionsRouter.get('/', async (request, response) => {
+  const { id } = request.user;
   const transactionsRepository = getCustomRepository(TransactionsRepository);
   const transactions = await transactionsRepository.find({
     relations: ['category'],
+    where: { user_id: id },
   });
 
   const balance = await transactionsRepository.getBalance();
@@ -44,8 +46,9 @@ transactionsRouter.post('/', async (request, response) => {
 
 transactionsRouter.delete('/:id', async (request, response) => {
   const { id } = request.params;
+
   const deleteTransaction = new DeleteTransactionService();
-  await deleteTransaction.execute({ id });
+  await deleteTransaction.execute({ id, user_id: request.user.id });
   return response.status(204).send();
 });
 
