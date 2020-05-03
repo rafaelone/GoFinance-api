@@ -4,7 +4,6 @@ import 'dotenv/config';
 import express, { Request, Response, NextFunction } from 'express';
 import 'express-async-errors';
 
-import * as Yup from 'yup';
 import cors from 'cors';
 
 import routes from './routes';
