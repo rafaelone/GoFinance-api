@@ -5,6 +5,8 @@ import path from 'path';
 import multer from 'multer';
 import uploadConfig from '../config/upload';
 
+import ensureAuthenticated from '../middlewares/ensureAuthenticated';
+
 import TransactionsRepository from '../repositories/TransactionsRepository';
 import CreateTransactionService from '../services/CreateTransactionService';
 import DeleteTransactionService from '../services/DeleteTransactionService';
@@ -12,6 +14,8 @@ import ImportTransactionsService from '../services/ImportTransactionsService';
 
 const upload = multer(uploadConfig);
 const transactionsRouter = Router();
+
+transactionsRouter.use(ensureAuthenticated);
 
 transactionsRouter.get('/', async (request, response) => {
   const transactionsRepository = getCustomRepository(TransactionsRepository);
@@ -25,12 +29,14 @@ transactionsRouter.get('/', async (request, response) => {
 
 transactionsRouter.post('/', async (request, response) => {
   const { title, value, type, category } = request.body;
+  const { id } = request.user;
   const createTransaction = new CreateTransactionService();
   const transaction = await createTransaction.execute({
     title,
     value,
     type,
     category,
+    idUser: id,
   });
 
   return response.json(transaction);
