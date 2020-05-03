@@ -4,6 +4,7 @@ import 'dotenv/config';
 import express, { Request, Response, NextFunction } from 'express';
 import 'express-async-errors';
 
+import * as Yup from 'yup';
 import cors from 'cors';
 
 import routes from './routes';
@@ -26,7 +27,11 @@ app.use((err: Error, request: Request, response: Response, _: NextFunction) => {
     });
   }
 
-  console.error(err);
+  if (err.name === 'ValidationError') {
+    return response.status(400).json({ status: 'error', message: err.message });
+  }
+
+  // console.error(err);
 
   return response.status(500).json({
     status: 'error',
